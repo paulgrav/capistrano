@@ -201,9 +201,27 @@ namespace :deploy do
   DESC
   task :update_code, :except => { :no_release => true } do
     on_rollback { run "rm -rf #{release_path}; true" }
-    strategy.deploy!
+	
+		st_deploy
+		if ( deploy_via == :copy )
+			compress_code
+			upload_code
+		end
+		
     finalize_update
   end
+
+	task :st_deploy, :except => { :no_release => true } do
+		strategy.deploy!
+	end
+	
+	task :compress_code, :except => { :no_release => true } do
+		strategy.compress_code!
+	end
+	
+	task :upload_code, :except => { :no_release => true } do
+		strategy.upload_code!
+	end
 
   desc <<-DESC
     [internal] Touches up the released code. This is called by update_code \

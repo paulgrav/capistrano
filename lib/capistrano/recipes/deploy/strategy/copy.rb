@@ -90,18 +90,22 @@ module Capistrano
               end
             end
           end
-
-          File.open(File.join(destination, "REVISION"), "w") { |f| f.puts(revision) }
+        end
+				
+				def compress_code!
+					File.open(File.join(destination, "REVISION"), "w") { |f| f.puts(revision) }
 
           logger.trace "compressing #{destination} to #{filename}"
           Dir.chdir(tmpdir) { system(compress(File.basename(destination), File.basename(filename)).join(" ")) }
+				end
 
-          upload(filename, remote_filename)
+				def upload_code!
+					upload(filename, remote_filename)
           run "cd #{configuration[:releases_path]} && #{decompress(remote_filename).join(" ")} && rm #{remote_filename}"
         ensure
           FileUtils.rm filename rescue nil
-          FileUtils.rm_rf destination rescue nil
-        end
+          FileUtils.rm_rf destination rescue nil					
+				end
 
         def check!
           super.check do |d|
